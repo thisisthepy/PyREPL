@@ -5,8 +5,21 @@ from pycomposeui.ui import modifier
 
 from model.config import ChatHistory
 
+import os
+from jupyterlab.labapp import LabApp
 
-from jupyterlab import labapp
+LAB_ASSETS = os.path.join(os.path.dirname(__file__), "share", "jupyter", "lab")
+LAB_HOST = "0.0.0.0", 55555  # TODO: Implement a way to set this from the UI system
+LAB_URL = f"http://127.0.0.1:{LAB_HOST[1]}"  # TODO: Find a way to auto run a browser with this URL
+LAB_TOKEN = "asdf"  # TODO: Find a way to generate a random token in runtime
+LAB_SPACE = os.path.join(os.environ['HOME'], "lab")
+LAB_CONFIG = [
+    f"--ip={LAB_HOST[0]}", f"--port={LAB_HOST[1]}", f"--app-dir={LAB_ASSETS}", "--no-browser",
+    f"--notebook-dir={LAB_SPACE}", f"--NotebookApp.token={LAB_TOKEN}"
+]
+
+if not os.path.isdir(LAB_SPACE):
+    os.makedirs(LAB_SPACE)
 
 
 @Composable
@@ -96,10 +109,7 @@ def App():
             scope.launch(runner)
 
     def run_jupyter():
-        import sys
-        sys.argv = ["jupyter-lab", "--ip=0.0.0.0", "--port=55555"]
-
-        scope.launch(labapp.main)
+        scope.launch(lambda: LabApp.launch_instance(LAB_CONFIG))
 
     SimpleColumn(modifier, content=lambda: {
         SimpleText(f"Current User Prompt:  {user_prompt.getValue()}"),
