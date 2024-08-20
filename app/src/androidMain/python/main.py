@@ -5,41 +5,8 @@ from pycomposeui.ui import modifier
 
 from model.config import ChatHistory
 
-'''
-import os
-import ctypes
-
-import jupyter
-jupyter.__loader__.finder.extract_if_changed(os.path.join("rpds", "rpds.cpython-311.so"))
-jupyter.__loader__.finder.extract_if_changed(os.path.join("rpds", "__init__.pyc"))
-jupyter.__loader__.finder.extract_if_changed(os.path.join("rpds", "__init__.pyi"))
-jupyter.__loader__.finder.extract_if_changed(os.path.join("rpds", "py.typed"))
-
-rpds_path = os.path.join(os.path.abspath(os.path.dirname(jupyter.__file__)), "rpds", "rpds.cpython-311.so")
-
-import sys
-
-path_backup = []
-for path in sys.path:
-    print(path)
-    path_backup.append(path)
-
-sys.path.clear()
-sys.path.append(path_backup[1])
-
-
-import rpds
-print(rpds)
-
-
-rpds = ctypes.CDLL(rpds_path)
-print(rpds.rpds)
-__doc__ = rpds.__doc__
-if hasattr(rpds, "__all__"):
-    print(rpds.__all__)
 
 from jupyterlab import labapp
-'''
 
 
 @Composable
