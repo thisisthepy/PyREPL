@@ -1,54 +1,30 @@
-import binascii
 import os
-import re
 import sys
-import time
+import json
+import runpy
+
+from jupyter_client import ioloop
 
 from android.content import Intent
-from com.chaquo.python import Python
-from com.chaquo.python.jupyter import KernelService
-from java.lang import Integer
-from jupyter_client import ioloop
-from notebook import auth, notebookapp
 
 
-SHUTDOWN_TIMEOUT = 2
+def main(intent):
+    os.chdir(intent.getStringExtra("jupyter_cwd"))
+    connection_filename = intent.getStringExtra("jupyter_connection_file")
+    print("Connection file: " +  # Use compact representation for log.
+          json.dumps(json.load(open(connection_filename))).strip())
 
-app = Python.getPlatform().getApplication()
-
-
-def main():
-    files_dir = str(app.getFilesDir())
-    os.chdir(files_dir)  # This will the the starting directory of the file browser.
-
+    # The kernel redirects standard streams to the notebook, and does not clean up after
+    # itself.
+    stdin, stdout, stderr = sys.stdin, sys.stdout, sys.stderr
     try:
-        with open("password.txt") as password_file:
-            password = password_file.read().strip()
-    except OSError:
-        password = binascii.hexlify(os.urandom(4)).decode("ascii")
-        with open("password.txt", "w") as password_file:
-            print(password, file=password_file)
-    print("Log in with the following password: " + password)
-
-    # The default locations are $HOME/.jupyter and $HOME/.local/share/jupyter, but these are
-    # inconvenient because neither the Jupyter notebook nor the Android Studio file explorer
-    # will display hidden files.
-    for name in ["config", "data"]:
-        dir_name = f"{files_dir}/jupyter/{name}"
-        os.makedirs(dir_name, exist_ok=True)
-        os.environ[f"JUPYTER_{name.upper()}_DIR"] = dir_name
-
-    with open(os.environ["JUPYTER_CONFIG_DIR"] + "/jupyter_notebook_config.py",
-              "w") as config_file:
-        config = {
-            "c.MultiKernelManager.kernel_manager_class": __name__ + ".ChaquopyManager",
-            "c.NotebookApp.allow_remote_access": True,
-            "c.NotebookApp.ip": "0.0.0.0",
-            "c.NotebookApp.password": auth.passwd(password),
-        }
-        for key, value in config.items():
-            print(f"{key} = {value!r}", file=config_file)
-    notebookapp.main()
+        sys.argv[1:] = ["-f", connection_filename]
+        runpy.run_module("ipykernel_launcher", run_name="__main__")
+    except SystemExit as e:
+        if e.code == 0:
+            pass
+    finally:
+        sys.stdin, sys.stdout, sys.stderr = stdin, stdout, stderr
 
 
 class ChaquopyManager(ioloop.IOLoopKernelManager):
