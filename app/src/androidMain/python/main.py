@@ -4,25 +4,7 @@ from pycomposeui.material3 import SimpleText, SimpleColumn, SimpleRow, SimpleBut
 from pycomposeui.ui import modifier
 
 from model.config import ChatHistory
-
-import os
-from jupyter_server import auth
-from jupyterlab.labapp import LabApp
-
-LAB_ASSETS = os.path.join(os.path.dirname(__file__), "share", "jupyter", "lab")
-LAB_PW = "asdf1234"
-LAB_HOST = "0.0.0.0", 55555  # TODO: Implement a way to set this from the UI system
-LAB_URL = f"http://127.0.0.1:{LAB_HOST[1]}"  # TODO: Find a way to auto run a browser with this URL
-LAB_TOKEN = "asdf"  # TODO: Find a way to generate a random token in runtime
-LAB_SPACE = os.path.join(os.environ['HOME'], "lab")
-LAB_CONFIG = [
-    f"--ip={LAB_HOST[0]}", f"--port={LAB_HOST[1]}", f"--app-dir={LAB_ASSETS}", "--browser=chrome",  # "--no-browser",
-    f"--notebook-dir={LAB_SPACE}", f"--NotebookApp.token={LAB_TOKEN}", f"--NotebookApp.password={auth.passwd(LAB_PW)}",
-    "--NotebookApp.allow_remote_access=True", "--MultiKernelManager.kernel_manager_class=repl.kernel.InAppKernelManager"
-]
-
-if not os.path.isdir(LAB_SPACE):
-    os.makedirs(LAB_SPACE)
+from repl import REPLConfig, LabApp
 
 
 @Composable
@@ -112,7 +94,7 @@ def App():
             scope.launch(runner)
 
     def run_jupyter():
-        scope.launch(lambda: LabApp.launch_instance(LAB_CONFIG))
+        scope.launch(lambda: LabApp.launch_instance(REPLConfig.LAB_CONFIG))
 
     SimpleColumn(modifier, content=lambda: {
         SimpleText(f"Current User Prompt:  {user_prompt.getValue()}"),

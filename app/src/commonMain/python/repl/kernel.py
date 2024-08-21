@@ -27,7 +27,7 @@ def main(intent):
         sys.stdin, sys.stdout, sys.stderr = stdin, stdout, stderr
 
 
-class ChaquopyManager(ioloop.IOLoopKernelManager):
+class InAppKernelManager(ioloop.IOLoopKernelManager):
     def _launch_kernel(self, kernel_cmd, **kwargs):
         if self.is_alive():
             raise RuntimeError("Can only run one kernel at a time")
