@@ -1,7 +1,17 @@
 import os
+import signal
+import asyncio
 
 from jupyter_server import auth
 from jupyterlab.labapp import LabApp
+
+
+from tornado.platform.asyncio import AnyThreadEventLoopPolicy
+
+
+# Allow notebook to be run on a non-main thread.
+asyncio.set_event_loop_policy(AnyThreadEventLoopPolicy())
+signal.signal = lambda signum, handler: signal.getsignal(signum)
 
 
 class REPLConfigImpl:
@@ -18,9 +28,10 @@ class REPLConfigImpl:
         return [
             f"--ip={self.LAB_HOST[0]}", f"--port={self.LAB_HOST[1]}",
             f"--app-dir={self.LAB_ASSETS}",  f"--notebook-dir={self.LAB_SPACE}",
-            f"--NotebookApp.token={self.LAB_TOKEN}", f"--NotebookApp.password={auth.passwd(self.LAB_PW)}",
+            f"--IdentityProvider.token={self.LAB_TOKEN}",
+            f"--PasswordIdentityProvider.hashed_password={auth.passwd(self.LAB_PW)}",
             "--MultiKernelManager.kernel_manager_class=repl.kernel.InAppKernelManager",
-            "--NotebookApp.allow_remote_access=True",
+            "--ServerApp.allow_remote_access=True",
             "--no-browser"  # "--browser=chrome"
         ]
 

@@ -57,9 +57,13 @@ chaquopy {
             install("jupyter")
         }
     }
+
     sourceSets {
         getByName("main") {
-            srcDir("src/androidMain/python")
+            srcDirs(
+                "src/androidMain/python", "src/androidMain/generated/meta",
+                "src/commonMain/python", "src/commonMain/generated/meta"
+            )
         }
     }
 }
