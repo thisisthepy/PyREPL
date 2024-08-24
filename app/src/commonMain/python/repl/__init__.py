@@ -1,6 +1,5 @@
 import os
 import signal
-import asyncio
 
 from jupyter_server import auth
 from jupyter_server.auth.identity import IdentityProvider

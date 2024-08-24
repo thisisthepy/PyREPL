@@ -42,6 +42,7 @@ chaquopy {
         pip {
             // Use the local repository for the Python packages.
             options("--extra-index-url", "libs/pip/local")
+            install("pip")
 
             // Dependencies for the llama-cpp-python package.
             install("typing-extensions")

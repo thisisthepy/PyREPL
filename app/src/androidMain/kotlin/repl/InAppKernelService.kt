@@ -13,23 +13,37 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.chaquo.python.Python
+import com.chaquo.python.android.AndroidPlatform
+import kotlin.system.exitProcess
 
 
 class InAppKernelService : Service() {
     private val tag = "InAppKernelService"
     private val notificationChannelId = "InAppKernelServiceNotificationChannel"
+    private var running = false
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        if (running) {
+            return START_NOT_STICKY
+        }
+
         val notification = createNotification()
         startForeground(1, notification)
 
         object : Thread() {
             override fun run() {
                 try {
+                    if (!Python.isStarted()) {
+                        val platform = AndroidPlatform(this@InAppKernelService)
+                        platform.redirectStdioToLogcat()
+                        Python.start(platform)
+                        Log.i(tag, "Python Process Started")
+                    }
+
                     Python.getInstance()
                         .getModule("repl.kernel")
                         .callAttr(
@@ -45,6 +59,7 @@ class InAppKernelService : Service() {
                 }
             }
         }.start()
+        running = true
 
         Log.i(tag, "Python REPL Kernel Service Started")
         return START_NOT_STICKY
@@ -68,6 +83,8 @@ class InAppKernelService : Service() {
 
     override fun onDestroy() {
         Log.i(tag, "Python REPL Kernel Service Destroyed")
-        stopForeground(STOP_FOREGROUND_DETACH);
+        stopForeground(STOP_FOREGROUND_DETACH)
+        running = false
+        exitProcess(0)
     }
 }
