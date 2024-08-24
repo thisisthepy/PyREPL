@@ -3,8 +3,15 @@ from pycomposeui.runtime import DefaultCoroutineScope, MainCoroutineScope
 from pycomposeui.material3 import SimpleText, SimpleColumn, SimpleRow, SimpleButton
 from pycomposeui.ui import modifier
 
+from android.content import Intent
+from android.net import Uri
+from pycomposeui.ui.platform import LocalContext
+
 from model.config import ChatHistory
-from repl import REPLConfig, LabApp
+from repl import REPLConfig, LabApp, setup_signal
+
+
+config = REPLConfig()
 
 
 @Composable
@@ -44,6 +51,8 @@ class RichText(Composable):
 
 @Composable
 def App():
+    context = LocalContext.current
+
     messages = remember_saveable("")
     status = remember_saveable("")
     count = remember_saveable(0)
@@ -94,7 +103,10 @@ def App():
             scope.launch(runner)
 
     def run_jupyter():
-        scope.launch(lambda: LabApp.launch_instance(REPLConfig.LAB_CONFIG))
+        intent = Intent(Intent.ACTION_VIEW, Uri.parse(config.uri))
+        setup_signal(main_scope)
+        scope.launch(lambda: LabApp.launch_instance(config.list))
+        context.startActivity(intent)
 
     SimpleColumn(modifier, content=lambda: {
         SimpleText(f"Current User Prompt:  {user_prompt.getValue()}"),

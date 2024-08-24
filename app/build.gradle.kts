@@ -34,6 +34,11 @@ chaquopy {
     defaultConfig {
         version = libs.versions.python.get()
 
+        pyc {
+            src = false
+            pip = false
+        }
+
         pip {
             // Use the local repository for the Python packages.
             options("--extra-index-url", "libs/pip/local")
@@ -54,6 +59,7 @@ chaquopy {
             install("pyzmq")
             install("rpds-py")
             install("argon2-cffi-bindings")
+            install("jupyterthemes")
             install("jupyter")
         }
     }
