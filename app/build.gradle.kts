@@ -43,6 +43,7 @@ chaquopy {
             // Use the local repository for the Python packages.
             options("--extra-index-url", "libs/pip/local")
             install("pip")
+            install("setuptools ")
 
             // Dependencies for the llama-cpp-python package.
             install("typing-extensions")
@@ -60,6 +61,7 @@ chaquopy {
             install("pyzmq")
             install("rpds-py")
             install("argon2-cffi-bindings")
+            install("jupyterlab==4.2.4")
             install("jupyterthemes")
             install("jupyter")
         }

@@ -4,8 +4,6 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
             android:allowBackup="true"
@@ -14,13 +12,6 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@android:style/Theme.Material.NoActionBar">
-        <service
-                android:name="repl.InAppKernelService"
-                android:foregroundServiceType="dataSync"
-                android:process=":kernel"
-                android:enabled="true"
-                android:exported="true" tools:ignore="ForegroundServicePermission">
-        </service>
 
         <activity
                 android:name=".MainActivity"
@@ -32,5 +23,85 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <service
+                android:name="repl.InAppKernelService0"
+                android:foregroundServiceType="dataSync"
+                android:process=":kernel0"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
+                android:name="repl.InAppKernelService1"
+                android:foregroundServiceType="dataSync"
+                android:process=":kernel1"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
+                android:name="repl.InAppKernelService2"
+                android:foregroundServiceType="dataSync"
+                android:process=":kernel2"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
+                android:name="repl.InAppKernelService3"
+                android:foregroundServiceType="dataSync"
+                android:process=":kernel3"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
+                android:name="repl.InAppKernelService4"
+                android:foregroundServiceType="dataSync"
+                android:process=":kernel4"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
+                android:name="repl.InAppKernelService5"
+                android:foregroundServiceType="dataSync"
+                android:process=":kernel5"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
+                android:name="repl.InAppKernelService6"
+                android:foregroundServiceType="dataSync"
+                android:process=":kernel6"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
+                android:name="repl.InAppKernelService7"
+                android:foregroundServiceType="dataSync"
+                android:process=":kernel7"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
+                android:name="repl.InAppKernelService8"
+                android:foregroundServiceType="dataSync"
+                android:process=":kernel8"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
+                android:name="repl.InAppKernelService9"
+                android:foregroundServiceType="dataSync"
+                android:process=":kernel9"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
     </application>
 </manifest>
