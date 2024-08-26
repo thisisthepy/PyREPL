@@ -28,6 +28,9 @@ class REPLConfig:
         # Get the current time
         current_time = time.time()
 
+        if not os.path.isdir(target_directory):
+            return
+
         # Iterate through all files in the target directory
         for filename in os.listdir(target_directory):
             file_path = os.path.join(target_directory, filename)
