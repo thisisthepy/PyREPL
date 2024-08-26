@@ -49,7 +49,7 @@ def interrupt_kernel(signum: int = signal.SIGINT):
     ipython = get_ipython()
     if ipython is not None and signum == signal.SIGINT:
         print("Interrupting cell...")
-        ipython.kernel.interrupt()
+        ipython.kernel.interrupt()  #TODO: Not working properly
     else:
         print("Interrupting kernel...")
         os.kill(os.getpid(), signum)
