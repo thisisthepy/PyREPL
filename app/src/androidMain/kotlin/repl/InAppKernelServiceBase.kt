@@ -22,13 +22,15 @@ open class InAppKernelServiceBase : Service() {
     protected open val tag = "InAppKernelService"
         get() = "$field$index"
     private val notificationId
-        get() = index
+        get() = 10000 + index
     private val notificationChannelId = "InAppKernelServiceNotificationChannel"
         get() = "$field$index"
     private val serviceName = "PyREPL Kernel Service"
         get() = "$field $index"
     protected open val replModule = "repl.kernel"
+    protected open val replPrepareFunction = "prepare_kernel"
     protected open val replFunction = "start_kernel"
+    protected open val replInterruptFunction = "interrupt_kernel"
     private var running = false
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -36,12 +38,8 @@ open class InAppKernelServiceBase : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        if (running) {
-            return START_NOT_STICKY
-        }
-
-        val notification = createNotification()
         try {
+            val notification = createNotification()
             startForeground(notificationId, notification)
         } catch (e: ForegroundServiceStartNotAllowedException) {
             throw ForegroundServiceStartNotAllowedException(
@@ -50,39 +48,66 @@ open class InAppKernelServiceBase : Service() {
                 "If you are using the app in foreground and still facing this issue, please report it.\n\n" +
                 "Error: ${e.message}"
             )
-        } catch (e: IllegalStateException) {
-            // Already started, so we need to update it instead.
-            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.notify(notificationId, notification)
         }
 
-        object : Thread() {
-            override fun run() {
-                try {
-                    if (!Python.isStarted()) {
-                        val platform = AndroidPlatform(this@InAppKernelServiceBase)
-                        Python.start(platform)
-                        Log.i(tag, "Python Process for REPL Kernel $index Started")
-                    }
+        if (!Python.isStarted()) {
+            val platform = AndroidPlatform(this@InAppKernelServiceBase)
+            Python.start(platform)
+            Log.i(tag, "Python Process for REPL Kernel $index Started")
+        }
 
-                    Python.getInstance()
-                        .getModule(replModule)
-                        .callAttr(
-                            replFunction,
-                            intent.getStringExtra("workdir"),
-                            intent.getStringExtra("filename")
-                        )
-                    Log.i(tag, "Python REPL Kernel $index exited normally")
-                } catch (e: Exception) {
-                    Log.e(tag, "Python REPL Kernel $index exited abnormally", e)
-                } finally {
-                    stopSelf()
-                }
+        val repl = Python.getInstance().getModule(replModule)
+        val workdir = intent.getStringExtra("workdir")
+        val filename = intent.getStringExtra("filename")
+        val signum = intent.getLongExtra("signum", -1L)
+
+        if (!running && workdir != null && filename != null) {
+            try {
+                repl.callAttr(replPrepareFunction)
+            } catch (e: Exception) {
+                Log.e(tag, e.toString())
             }
-        }.start()
-        running = true
+            object : Thread() {
+                override fun run() {
+                    try {
+                        repl.callAttr(
+                            replFunction,
+                            workdir,
+                            filename
+                        )
+                        Log.i(tag, "Python REPL Kernel $index exited normally")
+                    } catch (e: Exception) {
+                        Log.e(tag, "Python REPL Kernel $index exited abnormally", e)
+                    } finally {
+                        stopSelf()
+                    }
+                }
+            }.start()
+            running = true
 
-        Log.i(tag, "$serviceName Started")
+            Log.i(tag, "$serviceName Started")
+        } else if (signum != -1L) {
+            object : Thread() {
+                override fun run() {
+                    try {
+                        repl.callAttr(
+                            replInterruptFunction,
+                            signum
+                        )
+                        Log.i(tag, "Interrupt Python REPL Kernel $index exited normally")
+                    } catch (e: Exception) {
+                        Log.e(tag, "Interrupt for Python REPL Kernel $index exited abnormally", e)
+                    } finally {
+                        stopSelf()
+                    }
+                }
+            }.start()
+
+            Log.i(tag, "$serviceName Interrupted")
+        } else {
+            Log.i(tag, "$serviceName Already Running")
+        }
+
         return START_NOT_STICKY
     }
 
