@@ -384,10 +384,12 @@ fun generateMetaPythonClass(node: ClassNode, pyFile: File, allClasses: Map<Strin
         .filter { !it.access.hasFlag(Opcodes.ACC_PRIVATE) && !it.access.hasFlag(Opcodes.ACC_PROTECTED) }
         .filter { !it.name.startsWith("\$") }
         .filter { !it.name.startsWith("Companion") }
+        .filter { !it.name.contains("-")}
 
     val methods = node.methods
         .filter { !it.access.hasFlag(Opcodes.ACC_PRIVATE) && !it.access.hasFlag(Opcodes.ACC_PROTECTED) }
         .filter { !it.name.startsWith("<") }
+        .filter { !it.name.contains("-")}
 
     generateMetaPythonClassFields(pyFile, fields, className)
     generateMetaPythonClassMethods(pyFile, methods)
@@ -412,10 +414,12 @@ fun generateMetaPythonClass(node: ClassNode, pyFile: File, allClasses: Map<Strin
         val nestedFields = nestedClassNode.fields
             .filter { !it.access.hasFlag(Opcodes.ACC_PRIVATE) && !it.access.hasFlag(Opcodes.ACC_PROTECTED) }
             .filter { !it.name.startsWith("\$") }
+            .filter { !it.name.contains("-")}
 
         val nestedMethods = nestedClassNode.methods
             .filter { !it.access.hasFlag(Opcodes.ACC_PRIVATE) && !it.access.hasFlag(Opcodes.ACC_PROTECTED) }
             .filter { !it.name.startsWith("<") }
+            .filter { !it.name.contains("-")}
 
         generateMetaPythonClassFields(pyFile, nestedFields, "$className.$nestedClassName", "        ")
         generateMetaPythonClassMethods(pyFile, nestedMethods, "        ")
