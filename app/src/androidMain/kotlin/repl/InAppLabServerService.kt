@@ -3,6 +3,7 @@ package repl
 import android.app.*
 import android.util.Log
 import android.os.IBinder
+import android.widget.Toast
 import android.content.Intent
 import android.content.Context
 import kotlin.system.exitProcess
@@ -38,9 +39,9 @@ open class InAppLabServerService : Service() {
             val notification = createNotification()
             startForeground(notificationId, notification)
         } catch (e: ForegroundServiceStartNotAllowedException) {
-            throw ForegroundServiceStartNotAllowedException(
-                FOREGROUND_ERROR_MESSAGE + "\nError: ${e.message}"
-            )
+            val message = FOREGROUND_ERROR_MESSAGE + "\nError: ${e.message}"
+            Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
+            throw ForegroundServiceStartNotAllowedException(message)
         }
 
         if (!Python.isStarted()) {
@@ -70,6 +71,11 @@ open class InAppLabServerService : Service() {
                     Log.i(tag, "$processName exited normally")
                 } catch (e: Exception) {
                     Log.e(tag, "$processName exited abnormally", e)
+                    Toast.makeText(
+                        applicationContext,
+                        "An Error occurred in $processName: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 } finally {
                     stopSelf()
                 }
