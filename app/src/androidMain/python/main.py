@@ -51,98 +51,107 @@ class RichText(Composable):
 
 
 @Composable
-def App():
-    context = LocalContext.current
+class App(Composable):
+    versions = dict()
 
-    messages = remember_saveable("")
-    status = remember_saveable("")
-    count = remember_saveable(0)
+    @classmethod
+    def compose(cls):
+        context = LocalContext.current
 
-    scope = DefaultCoroutineScope()
-    main_scope = MainCoroutineScope()
+        cls.messages = messages = remember_saveable("")
+        cls.status = status = remember_saveable("")
+        cls.count = count = remember_saveable(0)
 
-    user_prompt = remember_saveable("안녕하세요!")
+        scope = DefaultCoroutineScope()
+        main_scope = MainCoroutineScope()
 
-    def change_prompt(prompt: str):
-        user_prompt.setValue(prompt)
+        user_prompt = remember_saveable("안녕하세요!")
 
-    llama3 = lambda chat_history, user_prompt, *args: []
-    token_streamer = lambda tokens, *args: []
-    chat_history = ChatHistory()
+        def change_prompt(prompt: str):
+            user_prompt.setValue(prompt)
 
-    def init_llama3():
-        def runner():
-            nonlocal llama3, token_streamer
-            print_state("Getting started...")
-            from model import llama3 as _llama3
-            token_streamer = _llama3.token_streamer
-            llama3 = _llama3.chat
-            print_state("Llama3 initialized")
+        llama3 = lambda chat_history, user_prompt, *args: []
+        token_streamer = lambda tokens, *args: []
+        chat_history = ChatHistory()
 
-        scope.launch(runner)
-
-    def print_state(text: str):
-        status.setValue(status.getValue() + "  " + text)
-
-    def print_messages(text: str):
-        messages.setValue(messages.getValue() + text)
-
-    def run_llama3(printer: callable = lambda x: print(x, end="", flush=True)):
-        _user_prompt = user_prompt.getValue()
-
-        if llama3 is None:
-            print_state("Llama3 not initialized!!")
-        else:
-            print_state("Inference...")
-
+        def init_llama3():
             def runner():
-                for chunk in token_streamer(*llama3(chat_history, _user_prompt)):
-                    printer(chunk)
-                printer("\n")
-                print_state("Done!")
+                nonlocal llama3, token_streamer
+                print_state("Getting started...")
+                from model import llama3 as _llama3
+                token_streamer = _llama3.token_streamer
+                llama3 = _llama3.chat
+                print_state("Llama3 initialized")
 
             scope.launch(runner)
 
-    def run_jupyter():
-        browser_intent = Intent(Intent.ACTION_VIEW, Uri.parse(config.uri))
+        def print_state(text: str):
+            status.setValue(status.getValue() + "  " + text)
 
-        def runner():
-            send_server_launch_intent(context, config)
-            time.sleep(1)
-            context.startActivity(browser_intent)
+        def print_messages(text: str):
+            messages.setValue(messages.getValue() + text)
 
-        scope.launch(runner)
+        def run_llama3(printer: callable = lambda x: print(x, end="", flush=True)):
+            _user_prompt = user_prompt.getValue()
 
+            if llama3 is None:
+                print_state("Llama3 not initialized!!")
+            else:
+                print_state("Inference...")
 
-    SimpleColumn(modifier, content=lambda: {
-        SimpleText(f"Current User Prompt:  {user_prompt.getValue()}"),
-        SimpleText(f"Log:{status.getValue()}"),
-        SimpleText(""),
-        SimpleText(messages.getValue()),
-        SimpleButton(
-            onclick=init_llama3,
-            content=lambda: {
-                SimpleText("Init Llama3")
-            }
-        ),
-        SimpleButton(
-            onclick=lambda: run_llama3(printer=print_messages),
-            content=lambda: {
-                SimpleText(f"Send User Prompt")
-            }
-        ),
-        SimpleButton(
-            onclick=lambda: {
-                change_prompt("오늘 날씨는 어때요?")
-            },
-            content=lambda: {
-                SimpleText(f"Change Prompt")
-            }
-        ),
-        SimpleButton(
-            onclick=run_jupyter,
-            content=lambda: {
-                SimpleText(f"Run Jupyter")
-            }
-        )
-    })
+                def runner():
+                    for chunk in token_streamer(*llama3(chat_history, _user_prompt)):
+                        printer(chunk)
+                    printer("\n")
+                    print_state("Done!")
+
+                scope.launch(runner)
+
+        def run_jupyter():
+            browser_intent = Intent(Intent.ACTION_VIEW, Uri.parse(config.uri))
+
+            def runner():
+                send_server_launch_intent(context, config)
+                time.sleep(1)
+                context.startActivity(browser_intent)
+
+            scope.launch(runner)
+
+        @Composable
+        def View():
+            SimpleText(f"Current User Prompt:  {user_prompt.getValue()}")
+            SimpleText(f"Log:{status.getValue()}")
+            SimpleText("")
+            SimpleText(messages.getValue())
+            SimpleButton(
+                onclick=init_llama3,
+                content=lambda: {
+                    SimpleText("Init Llama3")
+                }
+            )
+            SimpleButton(
+                onclick=lambda: run_llama3(printer=print_messages),
+                content=lambda: {
+                    SimpleText(f"Send User Prompt")
+                }
+            )
+            SimpleButton(
+                onclick=lambda: {
+                    change_prompt("오늘 날씨는 어때요?")
+                },
+                content=lambda: {
+                    SimpleText(f"Change Prompt")
+                }
+            )
+            SimpleButton(
+                onclick=run_jupyter,
+                content=lambda: {
+                    SimpleText(f"Run Jupyter")
+                }
+            )
+
+        cls.versions[0] = View
+
+        SimpleColumn(modifier, content=lambda: {
+            cls.versions[cls.count.getValue()]()
+        })
