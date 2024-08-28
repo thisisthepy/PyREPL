@@ -7,11 +7,12 @@ from android.content import Intent
 from android.net import Uri
 from pycomposeui.ui.platform import LocalContext
 
+import time
 from model.config import ChatHistory
-from repl import REPLConfig, LabApp, setup_signal
+from repl import REPLConfig, send_server_launch_intent, kernel
 
 
-config = REPLConfig()
+config = REPLConfig(manager_class=kernel.UIThreadKernelManager)
 
 
 @Composable
@@ -103,10 +104,15 @@ def App():
             scope.launch(runner)
 
     def run_jupyter():
-        intent = Intent(Intent.ACTION_VIEW, Uri.parse(config.uri))
-        setup_signal(main_scope)
-        scope.launch(lambda: LabApp.launch_instance(config.list))
-        context.startActivity(intent)
+        browser_intent = Intent(Intent.ACTION_VIEW, Uri.parse(config.uri))
+
+        def runner():
+            send_server_launch_intent(context, config)
+            time.sleep(1)
+            context.startActivity(browser_intent)
+
+        scope.launch(runner)
+
 
     SimpleColumn(modifier, content=lambda: {
         SimpleText(f"Current User Prompt:  {user_prompt.getValue()}"),

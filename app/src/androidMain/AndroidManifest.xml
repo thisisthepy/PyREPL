@@ -25,6 +25,21 @@
         </activity>
 
         <service
+                android:name="repl.InAppLabServerService"
+                android:foregroundServiceType="dataSync"
+                android:process=":lab"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
+                android:name="repl.UIThreadKernelService"
+                android:foregroundServiceType="dataSync"
+                android:enabled="true"
+                android:exported="true" tools:ignore="ForegroundServicePermission">
+        </service>
+
+        <service
                 android:name="repl.InAppKernelService0"
                 android:foregroundServiceType="dataSync"
                 android:process=":kernel0"

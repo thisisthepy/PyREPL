@@ -14,10 +14,12 @@ from ipykernel.kernelapp import IPKernelApp
 from IPython import get_ipython
 
 from java import jclass
+from java.lang import Integer
 from android.content import Intent
 from com.chaquo.python import Python
 
 from repl import InAppKernelServiceBase
+from repl import UIThreadKernelService
 
 app = Python.getPlatform().getApplication()
 
@@ -36,12 +38,11 @@ def prepare_kernel():
     sys.stdin, sys.stdout, sys.stderr = [open(file, "w+") for file in [stdin_file, stdout_file, stderr_file]]
 
 
-def start_kernel(workdir: str, filename: str):
+def start_kernel(workdir: str | None, filename: str):
     """ Will be called from the InAppKernelService (Multi-Process) """
-    os.chdir(workdir)
-    sys.argv[1:] = ["-f", filename]
-
-    IPKernelApp.launch_instance()
+    if workdir is not None:
+        os.chdir(workdir)
+    IPKernelApp.launch_instance(["-f", filename])
 
 
 def interrupt_kernel(signum: int = signal.SIGINT):
@@ -49,7 +50,7 @@ def interrupt_kernel(signum: int = signal.SIGINT):
     ipython = get_ipython()
     if ipython is not None and signum == signal.SIGINT:
         print("Interrupting cell...")
-        ipython.kernel.interrupt()  #TODO: Not working properly
+        ipython.kernel.interrupt()  # TODO: Not working properly
     else:
         print("Interrupting kernel...")
         os.kill(os.getpid(), signum)
@@ -69,13 +70,63 @@ class InAppKernelManager(ServerKernelManager):
         return await super().interrupt_kernel(*args, **kwargs)
 
 
+class UIThreadKernelManager(ServerKernelManager):
+    """ KernelManager that will run the kernel in the UI thread """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.kernel_service_class = UIThreadKernelService.getClass()
+
+    def _send_intent(self, stop=False, **extras):
+        intent = Intent(app, self.kernel_service_class)
+        for key, value in extras.items():
+            intent.putExtra(key, value)
+
+        if stop:
+            app.stopService(intent)
+        else:
+            app.startService(intent)
+
+    def is_alive(self):
+        activity_manager = app.getSystemService(app.ACTIVITY_SERVICE)
+        for service_info in activity_manager.getRunningServices(Integer.MAX_VALUE).toArray():
+            if service_info.service.getClassName() == self.kernel_service_class.getName():
+                return True
+        return False
+
+    async def start_kernel(self, *args, **kwargs):
+        return await super().start_kernel(*args, **kwargs)
+
+    async def _async_launch_kernel(self, kernel_cmd: List[str], **kwargs: Any) -> None:
+        if self.is_alive():
+            raise RuntimeError("Only one kernel can be run at a time with the UI thread mode.")
+        self._send_intent(workdir=kwargs['cwd'], filename=kernel_cmd[-1])
+
+    async def restart_kernel(self, *args, **kwargs):
+        return await super().restart_kernel(*args, **kwargs)
+
+    async def shutdown_kernel(self, *args, **kwargs):
+        return await super().shutdown_kernel(*args, **kwargs)
+
+    async def _async_kill_kernel(self, restart: bool = False) -> None:
+        self._send_intent(stop=True)
+        start_time = time.time()
+        while self.is_alive():
+            if time.time() > start_time + 5:
+                raise RuntimeError("Failed to kill kernel.")
+            time.sleep(0.1)
+
+    async def interrupt_kernel(self, *args, **kwargs):
+        return  # await super().interrupt_kernel(*args, **kwargs)
+
+
 class InAppLocalPrivateProvisioner(provisioning.local_provisioner.LocalProvisioner):
     """ Android LocalProvisioner that will start the kernel in a separate process """
 
     class Process:
         """ Represents a kernel process """
-        max_workers = InAppKernelServiceBase.maxWorkers  # Maximum number of kernels that can be started simultaneously
-                                                        # (declared in AndroidManifest.xml)
+        max_workers = InAppKernelServiceBase.MAX_WORKERS  # Maximum number of kernels that can be started simultaneously
+                                                        #  (declared in AndroidManifest.xml)
         kernel_service_basename = InAppKernelServiceBase.getClass().getName().replace("Base", "")
         _reserved_procs = []
         intent_wait_time = 5
@@ -132,7 +183,7 @@ class InAppLocalPrivateProvisioner(provisioning.local_provisioner.LocalProvision
             :return: The process info if the kernel is running, None otherwise
             """
             activity_manager = app.getSystemService(app.ACTIVITY_SERVICE)
-            for p_info in activity_manager.getRunningAppProcesses().toArray():
+            for p_info in activity_manager.getRunningAppProcesses(Integer.MAX_VALUE).toArray():
                 if ":".join(["", *p_info.processName.split(":")[1:]]) == f":kernel{self.process_name}":
                     return p_info
             return None
@@ -201,4 +252,4 @@ class InAppLocalPrivateProvisioner(provisioning.local_provisioner.LocalProvision
         return self.connection_info
 
 
-provisioning.LocalProvisioner = InAppLocalPrivateProvisioner
+#provisioning.LocalProvisioner = InAppLocalPrivateProvisioner

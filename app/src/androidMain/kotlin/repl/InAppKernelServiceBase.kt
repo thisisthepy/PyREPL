@@ -1,37 +1,44 @@
-@file:JvmName("InAppKernelServiceBase")
-
 package repl
 
 import android.app.*
-import android.content.Context
-import android.content.Intent
-import android.os.IBinder
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import com.chaquo.python.Python
-import com.chaquo.python.android.AndroidPlatform
+import android.os.IBinder
+import android.content.Intent
+import android.content.Context
 import kotlin.system.exitProcess
+import androidx.core.app.NotificationCompat
+
+import com.chaquo.python.android.AndroidPlatform
+import com.chaquo.python.Python
 
 
 open class InAppKernelServiceBase : Service() {
     companion object {
-        const val maxWorkers = 10  // Maximum number of workers that can be run simultaneously (will be referenced in python code)
+        const val MAX_WORKERS = 10  // Maximum number of workers that can be run simultaneously (will be referenced in python code)
+        const val NOTIFICATION_ID_PREFIX = 10000
+        const val FOREGROUND_ERROR_MESSAGE = "" +
+            "The REPL App should be in foreground when Python Kernel is trying to start" +
+            " due to Android 10+ restrictions. Please let the app run in foreground and retry.\n" +
+            "If you are using the app in foreground and still facing this issue, please report it.\n"
     }
 
     protected open val index = -1
     protected open val tag = "InAppKernelService"
         get() = "$field$index"
     private val notificationId
-        get() = 10000 + index
+        get() = NOTIFICATION_ID_PREFIX + index
     private val notificationChannelId = "InAppKernelServiceNotificationChannel"
         get() = "$field$index"
     private val serviceName = "PyREPL Kernel Service"
+        get() = "$field $index"
+    private val processName = "Python Process for REPL Kernel"
         get() = "$field $index"
     protected open val replModule = "repl.kernel"
     protected open val replPrepareFunction = "prepare_kernel"
     protected open val replFunction = "start_kernel"
     protected open val replInterruptFunction = "interrupt_kernel"
-    private var running = false
+    protected open val usingMultiProcess = true
+    private var isRunning = false
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -43,17 +50,14 @@ open class InAppKernelServiceBase : Service() {
             startForeground(notificationId, notification)
         } catch (e: ForegroundServiceStartNotAllowedException) {
             throw ForegroundServiceStartNotAllowedException(
-                "The REPL App should be in foreground when Python Kernel is trying to start" +
-                " due to Android 10+ restrictions. Please let the app run in foreground and retry.\n" +
-                "If you are using the app in foreground and still facing this issue, please report it.\n\n" +
-                "Error: ${e.message}"
+                FOREGROUND_ERROR_MESSAGE + "\nError: ${e.message}"
             )
         }
 
         if (!Python.isStarted()) {
             val platform = AndroidPlatform(this@InAppKernelServiceBase)
             Python.start(platform)
-            Log.i(tag, "Python Process for REPL Kernel $index Started")
+            Log.i(tag, "$processName started")
         }
 
         val repl = Python.getInstance().getModule(replModule)
@@ -61,7 +65,7 @@ open class InAppKernelServiceBase : Service() {
         val filename = intent.getStringExtra("filename")
         val signum = intent.getLongExtra("signum", -1L)
 
-        if (!running && workdir != null && filename != null) {
+        if (!isRunning && workdir != null && filename != null) {
             try {
                 repl.callAttr(replPrepareFunction)
             } catch (e: Exception) {
@@ -75,17 +79,17 @@ open class InAppKernelServiceBase : Service() {
                             workdir,
                             filename
                         )
-                        Log.i(tag, "Python REPL Kernel $index exited normally")
+                        Log.i(tag, "$processName exited normally")
                     } catch (e: Exception) {
-                        Log.e(tag, "Python REPL Kernel $index exited abnormally", e)
+                        Log.e(tag, "$processName exited abnormally", e)
                     } finally {
                         stopSelf()
                     }
                 }
             }.start()
-            running = true
+            isRunning = true
 
-            Log.i(tag, "$serviceName Started")
+            Log.i(tag, "$serviceName started")
         } else if (signum != -1L) {
             object : Thread() {
                 override fun run() {
@@ -94,9 +98,9 @@ open class InAppKernelServiceBase : Service() {
                             replInterruptFunction,
                             signum
                         )
-                        Log.i(tag, "Interrupt Python REPL Kernel $index exited normally")
+                        Log.i(tag, "Interrupt to $processName exited normally")
                     } catch (e: Exception) {
-                        Log.e(tag, "Interrupt for Python REPL Kernel $index exited abnormally", e)
+                        Log.e(tag, "Interrupt to $processName exited abnormally", e)
                     } finally {
                         stopSelf()
                     }
@@ -129,7 +133,9 @@ open class InAppKernelServiceBase : Service() {
     override fun onDestroy() {
         Log.i(tag, "$serviceName Destroyed")
         stopForeground(STOP_FOREGROUND_DETACH)
-        running = false
-        exitProcess(0)
+        isRunning = false
+        if (usingMultiProcess) {
+            exitProcess(0)
+        }
     }
 }

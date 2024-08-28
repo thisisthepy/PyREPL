@@ -40,6 +40,7 @@ kotlin {
         }
 
         commonMain.dependencies {
+            implementation(kotlin("reflect"))
             api(projects.pycomposeui)
         }
     }
