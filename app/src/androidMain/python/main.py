@@ -1,11 +1,11 @@
-from pycomposeui.runtime import Composable, EmptyComposable, remember_saveable
-from pycomposeui.runtime import DefaultCoroutineScope, MainCoroutineScope
-from pycomposeui.material3 import SimpleText, SimpleColumn, SimpleRow, SimpleButton
-from pycomposeui.ui import modifier
+from pythonx.compose.runtime import Composable, EmptyComposable, remember_saveable
+from pythonx.compose.runtime import DefaultCoroutineScope, MainCoroutineScope
+from pythonx.compose.material3 import SimpleText, SimpleColumn, SimpleRow, SimpleButton
+from pythonx.compose.ui import modifier
 
 from android.content import Intent
 from android.net import Uri
-from pycomposeui.ui.platform import LocalContext
+from pythonx.compose.ui import LocalContext
 
 import time
 from model.config import ChatHistory

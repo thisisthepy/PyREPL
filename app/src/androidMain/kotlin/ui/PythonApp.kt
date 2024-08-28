@@ -4,8 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import io.github.thisisthepy.pycomposeui.PythonAppView
-import io.github.thisisthepy.pycomposeui.PythonLauncher
+import ui.runtime.PythonAppView
 import ui.theme.AppTheme
 
 
@@ -13,8 +12,6 @@ import ui.theme.AppTheme
 @Composable
 fun App() {
     AppTheme {
-        PythonLauncher {
-            PythonAppView(Modifier.fillMaxSize())
-        }
+        PythonAppView(Modifier.fillMaxSize())
     }
 }

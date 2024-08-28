@@ -1,5 +1,5 @@
 from androidx.compose.ui.platform import AndroidCompositionLocals_androidKt
-from pycomposeui.runtime import Composable
+from pythonx.compose.runtime import Composable
 
 
 _LocalContext = AndroidCompositionLocals_androidKt.getLocalContext()
