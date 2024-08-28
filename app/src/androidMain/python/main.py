@@ -72,14 +72,14 @@ class App(Composable):
     def compose(cls):
         context = LocalContext.current
 
-        cls.messages = messages = remember_saveable("")
+        cls.messages = messages = remember_saveable("PyComposeUI PyREPL 데모에 오신 것을 환영합니다! ")
         cls.status = status = remember_saveable("")
         cls.count = remember_saveable(0)
 
         cls.scope = DefaultCoroutineScope()
         cls.main_scope = MainCoroutineScope()
 
-        cls.user_prompt = user_prompt = remember_saveable("안녕하세요!")
+        cls.user_prompt = remember_saveable("안녕하세요!")
 
         def run_jupyter():
             browser_intent = Intent(Intent.ACTION_VIEW, Uri.parse(config.uri))
@@ -93,8 +93,8 @@ class App(Composable):
 
         @Composable
         def View():
-            Text("PyComposeUI PyREPL 데모에 오신 것을 환영합니다!")
-            Text("- Android Demo v.0.0.1")
+            Text(messages.getValue())
+            Text("- Android Demo v0.0.1")
             Text("")
             Text("")
             Text("[Jupyter Lab 연결 정보]")
@@ -109,13 +109,13 @@ class App(Composable):
                     Text(f"실행 모드 변경 (현재 옵션: UI 스레드 동기화 모드)")
                 }
             )
-
             Button(
                 onclick=lambda: None,
                 content=lambda: {
                     Text(f"브라우저: 기본 브라우저 열기")
                 }
             )
+            Text("")
 
             Button(
                 onclick=run_jupyter,
