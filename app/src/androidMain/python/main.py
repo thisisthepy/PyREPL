@@ -1,11 +1,11 @@
-from pycomposeui.runtime import Composable, EmptyComposable, remember_saveable
-from pycomposeui.runtime import DefaultCoroutineScope, MainCoroutineScope
-from pycomposeui.material3 import SimpleText, SimpleColumn, SimpleRow, SimpleButton
-from pycomposeui.ui import modifier
+from pythonx.compose.runtime import Composable, EmptyComposable, remember_saveable
+from pythonx.compose.runtime import DefaultCoroutineScope, MainCoroutineScope
+from pythonx.compose.material3 import Text, Column, Row, Button
+from pythonx.compose.ui import modifier
 
 from android.content import Intent
 from android.net import Uri
-from pycomposeui.ui.platform import LocalContext
+from pythonx.compose.ui.platform import LocalContext
 
 import time
 from model.config import ChatHistory
@@ -17,13 +17,13 @@ config = REPLConfig(manager_class=kernel.UIThreadKernelManager)
 
 @Composable
 def UiTestCase(text: str = "UiTestCase"):
-    SimpleText(text)
+    Text(text)
 
 
 @Composable
 class UiTest:
     def compose(self, content: Composable = EmptyComposable):
-        SimpleColumn(modifier, content=lambda: {
+        Column(modifier, content=lambda: {
             UiTestCase(text="UiTestCase in UiTest"),
             content()
         })
@@ -33,16 +33,16 @@ class UiTest:
 class BasicText:
     @classmethod
     def compose(cls, text: str = "BasicText"):
-        SimpleText(text)
+        Text(text)
 
 
 @Composable
 class RichText(Composable):
     @staticmethod
     def compose(content: Composable = EmptyComposable):
-        SimpleColumn(modifier, content=Composable(lambda: {
+        Column(modifier, content=Composable(lambda: {
             BasicText("Basic Text inside of Rich Text"),
-            SimpleRow(lambda: {
+            Row(lambda: {
                 BasicText("Row Left Side  "),
                 BasicText("Row Right Side")
             }),
@@ -93,47 +93,47 @@ class App(Composable):
 
         @Composable
         def View():
-            SimpleText(f"Current User Prompt:  {user_prompt.getValue()}")
-            SimpleText(f"Log:{status.getValue()}")
-            SimpleText("")
-            SimpleText(messages.getValue())
-            SimpleButton(
-                onclick=init_llama3,
+            Text("PyComposeUI PyREPL 데모에 오신 것을 환영합니다!")
+            Text("- Android Demo v.0.0.1")
+            Text("")
+            Text("")
+            Text("[Jupyter Lab 연결 정보]")
+            Text(f">  IP: {config.ip}")
+            Text(f">  PORT: {config.port}")
+            Text(f">  PASSWORD: {config.password}")
+            Text("")
+
+            Button(
+                onclick=lambda: None,
                 content=lambda: {
-                    SimpleText("Init Llama3")
+                    Text(f"실행 모드 변경 (현재 옵션: UI 스레드 동기화 모드)")
                 }
             )
-            SimpleButton(
-                onclick=lambda: run_llama3(printer=print_messages),
+
+            Button(
+                onclick=lambda: None,
                 content=lambda: {
-                    SimpleText(f"Send User Prompt")
+                    Text(f"브라우저: 기본 브라우저 열기")
                 }
             )
-            SimpleButton(
-                onclick=lambda: {
-                    change_prompt("오늘 날씨는 어때요?")
-                },
-                content=lambda: {
-                    SimpleText(f"Change Prompt")
-                }
-            )
-            SimpleButton(
+
+            Button(
                 onclick=run_jupyter,
                 content=lambda: {
-                    SimpleText(f"Run Jupyter")
+                    Text(f"Jupyter Lab 실행")
                 }
             )
 
         cls.versions[0] = View
 
-        SimpleColumn(modifier, content=lambda: {
+        Column(modifier, content=lambda: {
             cls.versions[cls.count.getValue()]()
         })
 
 
 def init_llama3():
     def runner():
-        nonlocal llama3, token_streamer
+        global llama3, token_streamer
         print_state("Getting started...")
         from model import llama3 as _llama3
         token_streamer = _llama3.token_streamer
@@ -175,3 +175,31 @@ def run_llama3(printer: callable = lambda x: print(x, end="", flush=True)):
             print_state("Done!")
 
         App.scope.launch(runner)
+
+
+@Composable
+def LlamaView():
+    Text(f"Current User Prompt:  {App.user_prompt.getValue()}")
+    Text(f"Log:{App.status.getValue()}")
+    Text("")
+    Text(App.messages.getValue())
+    Button(
+        onclick=init_llama3,
+        content=lambda: {
+            Text("Init Llama3")
+        }
+    )
+    Button(
+        onclick=lambda: run_llama3(printer=print_messages),
+        content=lambda: {
+            Text(f"Send User Prompt")
+        }
+    )
+    Button(
+        onclick=lambda: {
+            change_prompt("오늘 날씨는 어때요?")
+        },
+        content=lambda: {
+            Text(f"Change Prompt")
+        }
+    )

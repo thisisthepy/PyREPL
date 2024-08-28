@@ -1,6 +1,6 @@
-from pycomposeui.runtime import Composable, EmptyComposable
-from pycomposeui.ui import Modifier, Alignment
-from pycomposeui.layout import Arrangement
+from pythonx.compose.runtime import Composable
+from pythonx.compose.ui import Modifier, Alignment
+from pythonx.compose.layout import Arrangement
 
 from java import jclass
 import traceback
@@ -18,13 +18,13 @@ try:
     _SimpleButton = _material3_android.SimpleButtonWidget
 
     @Composable
-    class SimpleText(Composable):
+    class Text(Composable):
         @classmethod
         def compose(cls, text: str = ""):
             _SimpleText(text, cls.composer, 1)
 
     @Composable
-    class SimpleColumn(Composable):
+    class Column(Composable):
         @classmethod
         def compose(cls, modifier: Modifier,
                     vertical_arrangement: Arrangement.Vertical = Arrangement.Center,
@@ -33,13 +33,13 @@ try:
             _SimpleColumn(modifier, vertical_arrangement, horizontal_alignment, content, cls.composer, 1)
 
     @Composable
-    class SimpleRow(Composable):
+    class Row(Composable):
         @classmethod
         def compose(cls, content):
             _SimpleRow(content, cls.composer, 1)
 
     @Composable
-    class SimpleButton(Composable):
+    class Button(Composable):
         @classmethod
         def compose(cls, onclick, content):
             _SimpleButton(onclick, content, cls.composer, 1)

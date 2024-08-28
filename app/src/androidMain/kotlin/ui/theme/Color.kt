@@ -12,11 +12,11 @@ val colorLight = lightColorScheme(
     primary = Color.Black,
     onPrimary = Color.White,
     secondary = Color.White,
-    onSecondary = Color(0xFF6E7C96),
-    tertiary = Color(0xFF6E7C96),
+    onSecondary = Color.Black,
+    tertiary = Color.Gray,
     onTertiary = Color.White,
-    background = Color(0xFFE9F1FD),
-    onBackground = Color(0xFFA2B0C9),
+    background = Color.White,
+    onBackground = Color.Gray,
     surface = Color.White
 )
 
