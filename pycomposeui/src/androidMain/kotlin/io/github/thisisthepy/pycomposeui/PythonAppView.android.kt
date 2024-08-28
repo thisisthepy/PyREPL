@@ -37,7 +37,7 @@ fun PythonLauncher(
         Python.start(platform)
         println("PythonLauncher: Python is started...")
     }
-    val runtime = Python.getInstance().getModule("pycomposeui.runtime")
+    val runtime = Python.getInstance().getModule("pythonx.compose.runtime")
     val composable = runtime["Composable"]
     if (composable != null) {
         composable.callAttr("register_composer", currentComposer)
