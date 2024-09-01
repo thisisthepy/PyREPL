@@ -1,4 +1,4 @@
-package io.github.thisisthepy.pythonapptemplate
+package io.github.thisisthepy.pyrepl
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

@@ -1,14 +1,17 @@
 package io.github.thisisthepy.pycomposeui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -19,15 +22,71 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
-import kotlin.jvm.JvmName
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+
+@JvmName("SimpleIcon")
+@Composable
+fun IconWrapper(
+    icon: ImageVector,
+    contentDescription: String,
+    modifier: Modifier,
+    color: Long
+) {
+    Icons.Default.Favorite
+    Icon(icon, contentDescription, modifier, Color(color))
+}
+
+
+val FavoriteIcon
+    @JvmName("FavoriteIcon")
+    get() = Icons.Default.Favorite
+
+
+val AddIcon
+    @JvmName("AddIcon")
+    get() = Icons.Default.Add
+
+
+val KeyboardArrowDownIcon
+    @JvmName("KeyboardArrowDownIcon")
+    get() = Icons.Default.KeyboardArrowDown
+
+
+val KeyboardArrowUpIcon
+    @JvmName("KeyboardArrowUpIcon")
+    get() = Icons.Default.KeyboardArrowUp
+
+
+val PlayArrowIcon
+    @JvmName("PlayArrowIcon")
+    get() = Icons.Default.PlayArrow
+
+
+val DeleteIcon
+    @JvmName("DeleteIcon")
+    get() = Icons.Default.Delete
+
 
 
 @JvmName("SimpleTextWidget")
 @Composable
 fun SimpleTextWidget(
-    text: String
+    text: String,
+    color: Long,
+    fontSize: Float
 ) {
-    Text(text)
+    Text(text, Modifier, Color(color), fontSize.sp)
+}
+
+
+@JvmName("SimpleSpacer")
+@Composable
+fun SimpleSpacer(
+    start: Float, top: Float, end: Float, bottom: Float
+) {
+    Spacer(Modifier.padding(start.dp, top.dp, end.dp, bottom.dp))
 }
 
 

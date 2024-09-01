@@ -22,7 +22,7 @@ plugins {
 }
 
 
-group = "io.github.thisisthepy.pythonapptemplate"
+group = "io.github.thisisthepy.pyrepl"
 version = "1.0.0.0"
 
 
@@ -68,6 +68,7 @@ chaquopy {
             install("diskcache")
             install("jinja2")
             install("MarkupSafe")
+            install("websocket-client")
             install("llama-cpp-python")
 
             // Dependencies for the huggingface_hub package.
@@ -110,7 +111,7 @@ android {
         versionCode = 1
         versionName = version.toString()
         ndk {
-            abiFilters += listOf("arm64-v8a", "x86_64", "armeabi-v7a", "x86")
+            abiFilters += listOf("arm64-v8a", "x86_64"/*, "armeabi-v7a", "x86"*/)
         }
     }
     packaging {

@@ -1,7 +1,9 @@
-from pythonx.compose.runtime import Composable, EmptyComposable, remember_saveable
+from pythonx.compose.runtime import Composable, remember_saveable
 from pythonx.compose.runtime import DefaultCoroutineScope, MainCoroutineScope
-from pythonx.compose.material3 import Text, Column, Row, Button
-from pythonx.compose.ui import modifier
+from pythonx.compose.material3 import Icon, DefaultIcons, Text, TextField
+from pythonx.compose.material3 import Column, Row, Button, Card, Spacer
+from pythonx.compose.ui import Modifier, Alignment, modifier
+from pythonx.compose.layout import Arrangement
 
 from android.content import Intent
 from android.net import Uri
@@ -14,40 +16,6 @@ from repl import REPLConfig, send_server_launch_intent, kernel
 
 config = REPLConfig(manager_class=kernel.UIThreadKernelManager)
 
-
-@Composable
-def UiTestCase(text: str = "UiTestCase"):
-    Text(text)
-
-
-@Composable
-class UiTest:
-    def compose(self, content: Composable = EmptyComposable):
-        Column(modifier, content=lambda: {
-            UiTestCase(text="UiTestCase in UiTest"),
-            content()
-        })
-
-
-@Composable
-class BasicText:
-    @classmethod
-    def compose(cls, text: str = "BasicText"):
-        Text(text)
-
-
-@Composable
-class RichText(Composable):
-    @staticmethod
-    def compose(content: Composable = EmptyComposable):
-        Column(modifier, content=Composable(lambda: {
-            BasicText("Basic Text inside of Rich Text"),
-            Row(lambda: {
-                BasicText("Row Left Side  "),
-                BasicText("Row Right Side")
-            }),
-            content()
-        }))
 
 
 @Composable
@@ -105,22 +73,25 @@ class App(Composable):
 
             Button(
                 onclick=lambda: None,
+                color=0xFF000000,
                 content=lambda: {
-                    Text(f"실행 모드 변경 (현재 옵션: UI 스레드 동기화 모드)")
+                    Text(f"실행 모드 변경 (현재 옵션: UI 스레드 동기화 모드)", color=0xFFFFFFFF)
                 }
             )
             Button(
                 onclick=lambda: None,
+                color=0xFF000000,
                 content=lambda: {
-                    Text(f"브라우저: 기본 브라우저 열기")
+                    Text(f"브라우저: 기본 브라우저 열기", color=0xFFFFFFFF)
                 }
             )
             Text("")
 
             Button(
                 onclick=run_jupyter,
+                color=0xFF000000,
                 content=lambda: {
-                    Text(f"Jupyter Lab 실행")
+                    Text(f"Jupyter Lab 실행", color=0xFFFFFFFF)
                 }
             )
 
@@ -186,13 +157,13 @@ def LlamaView():
     Button(
         onclick=init_llama3,
         content=lambda: {
-            Text("Init Llama3")
+            Text("Init Llama3", color=0xFFFFFFFF)
         }
     )
     Button(
         onclick=lambda: run_llama3(printer=print_messages),
         content=lambda: {
-            Text(f"Send User Prompt")
+            Text(f"Send User Prompt", color=0xFFFFFFFF)
         }
     )
     Button(
@@ -200,6 +171,6 @@ def LlamaView():
             change_prompt("오늘 날씨는 어때요?")
         },
         content=lambda: {
-            Text(f"Change Prompt")
+            Text(f"Change Prompt", color=0xFFFFFFFF)
         }
     )
