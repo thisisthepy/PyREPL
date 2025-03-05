@@ -183,7 +183,7 @@ class InAppLocalPrivateProvisioner(provisioning.local_provisioner.LocalProvision
             :return: The process info if the kernel is running, None otherwise
             """
             activity_manager = app.getSystemService(app.ACTIVITY_SERVICE)
-            for p_info in activity_manager.getRunningAppProcesses(Integer.MAX_VALUE).toArray():
+            for p_info in activity_manager.getRunningAppProcesses().toArray():
                 if ":".join(["", *p_info.processName.split(":")[1:]]) == f":kernel{self.process_name}":
                     return p_info
             return None
@@ -252,4 +252,4 @@ class InAppLocalPrivateProvisioner(provisioning.local_provisioner.LocalProvision
         return self.connection_info
 
 
-#provisioning.LocalProvisioner = InAppLocalPrivateProvisioner
+provisioning.LocalProvisioner = InAppLocalPrivateProvisioner
