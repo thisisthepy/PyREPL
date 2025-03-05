@@ -11,7 +11,7 @@ from pythonx.compose.ui.platform import LocalContext
 
 import time
 from model.config import ChatHistory
-from repl import REPLConfig, send_server_launch_intent, kernel
+from repl import REPLConfig, send_server_launch_intent, send_server_stop_intent, kernel, UIThreadKernelService
 
 
 config = REPLConfig(manager_class=kernel.UIThreadKernelManager)
@@ -49,12 +49,34 @@ class App(Composable):
 
         cls.user_prompt = remember_saveable("안녕하세요!")
 
+        cls.target_manager =  remember_saveable(config.manager.split(".")[-1])
+
+        def get_target_manager_class():
+            if cls.target_manager.getValue() == "UIThreadKernelManager":
+                return kernel.UIThreadKernelManager
+            else:
+                return kernel.InAppKernelManager
+
+        def change_mode():
+            current_manager = cls.target_manager.getValue()
+            new_value = "InAppKernelManager" if current_manager == "UIThreadKernelManager" else "UIThreadKernelManager"
+            cls.target_manager.setValue(new_value)
+
         def run_jupyter():
-            browser_intent = Intent(Intent.ACTION_VIEW, Uri.parse(config.uri))
+            new_config = REPLConfig(manager_class=get_target_manager_class())
+            browser_intent = Intent(Intent.ACTION_VIEW, Uri.parse(new_config.uri))
 
             def runner():
-                send_server_launch_intent(context, config)
+                kernel_service_class = UIThreadKernelService.getClass()
+                intent = Intent(context, kernel_service_class)
+                context.stopService(intent)
+
+                send_server_stop_intent(context)
                 time.sleep(1)
+
+                send_server_launch_intent(context, new_config)
+                time.sleep(1)
+
                 context.startActivity(browser_intent)
 
             cls.scope.launch(runner)
@@ -72,10 +94,10 @@ class App(Composable):
             Text("")
 
             Button(
-                onclick=lambda: None,
+                onclick=change_mode,
                 color=0xFF000000,
                 content=lambda: {
-                    Text(f"실행 모드 변경 (현재 옵션: UI 스레드 동기화 모드)", color=0xFFFFFFFF)
+                    Text(f"실행 모드 변경 (현재 옵션: {cls.target_manager.getValue()[:-7]} 모드)", color=0xFFFFFFFF)
                 }
             )
             Button(
