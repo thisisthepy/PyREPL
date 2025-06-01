@@ -25,20 +25,13 @@ fun AppTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme  = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+//            val context = LocalContext.current
+//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+//        }
 
         darkTheme -> colorDark
         else -> colorLight
-    }
-
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            (view.context as Activity).setStatusBarTransparent(view, !darkTheme)
-        }
     }
 
     MaterialTheme(
@@ -52,20 +45,4 @@ fun AppTheme(
             content = content
         )
     }
-}
-
-
-fun Activity.setStatusBarTransparent(localView: View, lightSystemBar: Boolean) {
-    window.apply {
-        setFlags(
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-        )
-    }
-    if (Build.VERSION.SDK_INT >= 30) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-    }
-
-    WindowCompat.getInsetsController(this.window, localView).isAppearanceLightStatusBars = lightSystemBar
-    WindowCompat.getInsetsController(this.window, localView).isAppearanceLightNavigationBars = lightSystemBar
 }

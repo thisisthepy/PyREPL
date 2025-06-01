@@ -19,19 +19,104 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.Font
 import ui.style.AutoSizeTextWithResizer
+
+import pyrepl.app.generated.resources.Res
+import pyrepl.app.generated.resources.SUITE_Variable
+
+
+val SuiteFontFamily: FontFamily
+    @Composable get() = FontFamily(
+        Font(Res.font.SUITE_Variable, weight = FontWeight.Light),
+        Font(Res.font.SUITE_Variable, weight = FontWeight.Normal),
+        Font(Res.font.SUITE_Variable, weight = FontWeight.Medium),
+        Font(Res.font.SUITE_Variable, weight = FontWeight.SemiBold),
+        Font(Res.font.SUITE_Variable, weight = FontWeight.Bold)
+    )
 
 
 val typography
     @Composable get() = Typography(
-    bodyMedium = TextStyle(
-        //fontFamily = suiteFontFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        displayLarge = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 32.sp
+        ),
+        displayMedium = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 28.sp
+        ),
+        displaySmall = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp
+        ),
+        headlineLarge = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 22.sp
+        ),
+        headlineMedium = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp
+        ),
+        headlineSmall = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp
+        ),
+        titleLarge = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp
+        ),
+        titleMedium = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp
+        ),
+        titleSmall = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp
+        ),
+        bodyLarge = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 18.sp
+        ),
+        bodyMedium = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp
+        ),
+        bodySmall = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp
+        ),
+        labelLarge = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp
+        ),
+        labelMedium = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 12.sp
+        ),
+        labelSmall = TextStyle(
+            fontFamily = SuiteFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 10.sp
+        )
     )
-)
-/*
 
+
+/*
 @Composable
 fun HeadText(
     text: String,
