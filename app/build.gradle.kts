@@ -28,7 +28,6 @@ version = "1.0.0.0"
 
 kotlin {
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
@@ -36,11 +35,28 @@ kotlin {
     
     sourceSets {
         androidMain.dependencies {
+            api(compose.preview)
+            api(libs.androidx.activity.compose)
+
+            // For PythonX UI support
             api(projects.pycomposeui)
         }
 
         commonMain.dependencies {
+            api(compose.runtime)
+            api(compose.foundation)
+            api(compose.material3)
+            api(compose.ui)
+            api(compose.components.resources)
+            api(compose.components.uiToolingPreview)
+            api(libs.androidx.lifecycle.viewmodel)
+            api(libs.androidx.lifecycle.runtime.compose)
             implementation(kotlin("reflect"))
+
+            // For Compose WebView support
+            api(libs.compose.webview.multiplatform)
+
+            // For PythonX UI support
             api(projects.pycomposeui)
         }
     }

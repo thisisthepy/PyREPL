@@ -1,24 +1,25 @@
 [versions]
-agp = "8.7.3"
+agp = "8.3.0"
 android-compileSdk = "35"
 android-minSdk = "26"
 android-targetSdk = "35"
 androidx-activityCompose = "1.9.1"
 androidx-appcompat = "1.7.0"
-androidx-constraintlayout = "2.2.1"
+androidx-constraintlayout = "2.1.4"
 androidx-core-ktx = "1.13.1"
 androidx-espresso-core = "3.6.1"
-androidx-lifecycle = "2.9.0"
+androidx-lifecycle = "2.8.0"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
-compose-plugin = "1.8.1"
+compose-plugin = "1.8.0"
 compose-webview = "1.9.40"
 junit = "4.13.2"
-kotlin = "2.1.21"
+kotlin = "2.0.20"
 python = "3.11"
 chaquo = "15.0.1"
 
 [libraries]
+compose-webview-multiplatform = { module = "io.github.kevinnzou:compose-webview-multiplatform", version.ref = "compose-webview" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
