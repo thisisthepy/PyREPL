@@ -32,7 +32,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PythonAppTemplate"
+rootProject.name = "PyREPL"
 
 include(":app")
 include(":pycomposeui")

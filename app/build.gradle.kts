@@ -79,6 +79,7 @@ chaquopy {
             install("pyzmq")
             install("rpds-py")
             install("argon2-cffi-bindings")
+            install("notebook==7.3.3")
             install("jupyterlab==4.2.4")
             install("jupyterthemes")
             install("jupyter")
