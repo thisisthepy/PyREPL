@@ -1,5 +1,5 @@
 from .config import REPLConfig
-from .server import run_lab_server, send_server_launch_intent
+from .server import run_lab_server, send_server_launch_intent, send_server_stop_intent
 
 import signal
 

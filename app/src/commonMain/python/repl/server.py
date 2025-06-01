@@ -22,3 +22,7 @@ def send_server_launch_intent(context, config: REPLConfig):
     for key, value in config.dict.items():
         intent.putExtra(key, value)
     context.startService(intent)
+
+def send_server_stop_intent(context):
+    intent = Intent(context, InAppLabServerService.getClass())
+    context.stopService(intent)
