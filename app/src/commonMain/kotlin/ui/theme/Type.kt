@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import ui.style.AutoSizeTextWithResizer
 
-import pyrepl.app.generated.resources.Res
-import pyrepl.app.generated.resources.SUITE_Variable
+import io.github.thisisthepy.pyrepl.app.generated.resources.Res
+import io.github.thisisthepy.pyrepl.app.generated.resources.SUITE_Variable
 
 
 val SuiteFontFamily: FontFamily
